@@ -112,22 +112,29 @@ public class DashboardServiceImpl implements DashboardService {
         var categoryStats = expenseRepository
                 .getCategoryStatsByUserIdAndDateBetween(userId, startOfMonth, endOfMonth);
 
+        // Handle null or empty results
+        if (categoryStats == null || categoryStats.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         BigDecimal totalAmount = categoryStats.stream()
-                .map(s -> BigDecimal.valueOf(s.getTotal()))
+                .map(s -> s.getTotal() != null ? BigDecimal.valueOf(s.getTotal()) : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return categoryStats.stream()
                 .map(stat -> {
-                    BigDecimal amount = BigDecimal.valueOf(stat.getTotal());
+                    BigDecimal amount = stat.getTotal() != null 
+                            ? BigDecimal.valueOf(stat.getTotal()) 
+                            : BigDecimal.ZERO;
                     BigDecimal percentage = totalAmount.compareTo(BigDecimal.ZERO) > 0
                             ? amount.multiply(BigDecimal.valueOf(100))
                             .divide(totalAmount, 2, RoundingMode.HALF_UP)
                             : BigDecimal.ZERO;
 
                     return CategoryBreakdownDto.builder()
-                            .category(stat.get_id())
+                            .category(stat.get_id() != null ? stat.get_id() : "Unknown")
                             .amount(amount)
-                            .count(stat.getCount())
+                            .count(stat.getCount() != null ? stat.getCount() : 0)
                             .percentage(percentage)
                             .build();
                 })
