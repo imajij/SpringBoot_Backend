@@ -7,7 +7,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/finance_tracker}
+      uri: mongodb+srv://Moody:eZ]EGTV7C3~2QY-@cluster0.dz40wrp.mongodb.net/finance_tracker?retryWrites=true&w=majority
       database: finance_tracker
 
   jackson:
