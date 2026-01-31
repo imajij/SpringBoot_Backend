@@ -29,3 +29,17 @@ logging:
     org.springframework.data.mongodb: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Email Configuration
+spring:
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: tharkimon23@gmail.com
+    password: Th@050106
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

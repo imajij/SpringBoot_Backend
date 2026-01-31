@@ -20,44 +20,51 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final JwtTokenProvider jwtTokenProvider;
+        private final AuthenticationManager authenticationManager;
+        private final com.financetracker.service.EmailService emailService;
 
-    @Override
-    public AuthResponse register(RegisterRequest request) {
-        log.info("Registering new user with email: {}", request.getEmail());
+        @Override
+        public AuthResponse register(RegisterRequest request) {
+                log.info("Registering new user with email: {}", request.getEmail());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("User", "email", request.getEmail());
-        }
+                if (userRepository.existsByEmail(request.getEmail())) {
+                        throw new DuplicateResourceException("User", "email", request.getEmail());
+                }
 
-        User user = User.builder()
-                .email(request.getEmail().toLowerCase())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .roles(List.of("USER"))
-                .active(true)
-                .build();
+                User user = User.builder()
+                                .email(request.getEmail().toLowerCase())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .firstName(request.getFirstName())
+                                .lastName(request.getLastName())
+                                .roles(List.of("USER"))
+                                .active(true)
+                                .build();
 
-        User savedUser = userRepository.save(user);
-        log.info("User registered successfully with ID: {}", savedUser.getId());
+                User savedUser = userRepository.save(user);
+                log.info("User registered successfully with ID: {}", savedUser.getId());
 
-        // Authenticate and generate token
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                // Send welcome email
+                String subject = "Welcome to Finance Tracker!";
+                String body = String.format("Hello %s,\n\nThank you for registering at Finance Tracker. We're excited to have you on board!\n\nBest regards,\nFinance Tracker Team", savedUser.getFirstName());
+                emailService.sendEmail(savedUser.getEmail(), subject, body);
 
-        String token = jwtTokenProvider.generateToken(authentication);
+                // Authenticate and generate token
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                );
 
-        return buildAuthResponse(token, savedUser);
+                String token = jwtTokenProvider.generateToken(authentication);
+
+                return buildAuthResponse(token, savedUser);
     }
 
     @Override
