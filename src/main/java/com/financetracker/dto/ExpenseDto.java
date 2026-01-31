@@ -38,4 +38,6 @@ public class ExpenseDto {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private String billPhoto; // Stores filename of uploaded bill photo
 }

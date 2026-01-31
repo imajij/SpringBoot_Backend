@@ -42,10 +42,13 @@ public class ExpenseController {
         return ResponseEntity.ok(ApiResponse.success(expense));
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseDto>> createExpense(@Valid @RequestBody ExpenseDto expenseDto) {
-        log.info("Creating new expense");
-        ExpenseDto createdExpense = expenseService.createExpense(expenseDto);
+
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<ApiResponse<ExpenseDto>> createExpenseWithFile(
+            @RequestPart("expense") @Valid ExpenseDto expenseDto,
+            @RequestPart(value = "billPhoto", required = false) org.springframework.web.multipart.MultipartFile billPhoto) {
+        log.info("Creating new expense with file upload");
+        ExpenseDto createdExpense = expenseService.createExpenseWithFile(expenseDto, billPhoto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Expense created successfully", createdExpense));

@@ -24,16 +24,19 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final ExpenseMapper expenseMapper;
     private final SecurityUtils securityUtils;
+    private final com.financetracker.service.FileStorageService fileStorageService;
 
     private static final List<String> DEFAULT_CATEGORIES = Arrays.asList(
             "Food & Dining", "Transportation", "Shopping", "Entertainment",
             "Bills & Utilities", "Healthcare", "Education", "Travel", "Other"
     );
+
 
     @Override
     public ExpenseDto createExpense(ExpenseDto expenseDto) {
@@ -45,6 +48,25 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Expense savedExpense = expenseRepository.save(expense);
         log.info("Expense created with ID: {}", savedExpense.getId());
+
+        return expenseMapper.toDto(savedExpense);
+    }
+
+    @Override
+    public ExpenseDto createExpenseWithFile(ExpenseDto expenseDto, org.springframework.web.multipart.MultipartFile billPhoto) {
+        String userId = securityUtils.getCurrentUserId();
+        log.info("Creating expense with file for user: {}", userId);
+
+        Expense expense = expenseMapper.toEntity(expenseDto);
+        expense.setUserId(userId);
+
+        if (billPhoto != null && !billPhoto.isEmpty()) {
+            String fileName = fileStorageService.storeFile(billPhoto);
+            expense.setBillPhoto(fileName);
+        }
+
+        Expense savedExpense = expenseRepository.save(expense);
+        log.info("Expense created with ID: {} and bill photo: {}", savedExpense.getId(), savedExpense.getBillPhoto());
 
         return expenseMapper.toDto(savedExpense);
     }

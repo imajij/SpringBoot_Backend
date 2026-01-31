@@ -37,6 +37,8 @@ public class Expense {
 
     private String notes;
 
+    private String billPhoto; // Stores filename of uploaded bill photo
+
     @CreatedDate
     private LocalDateTime createdAt;
 

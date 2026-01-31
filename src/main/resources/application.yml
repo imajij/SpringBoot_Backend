@@ -1,3 +1,6 @@
+# File upload directory
+file:
+  upload-dir: uploads
 server:
   port: 8080
 

@@ -12,6 +12,8 @@ public interface ExpenseService {
 
     ExpenseDto createExpense(ExpenseDto expenseDto);
 
+    ExpenseDto createExpenseWithFile(ExpenseDto expenseDto, org.springframework.web.multipart.MultipartFile billPhoto);
+
     ExpenseDto getExpenseById(String id);
 
     Page<ExpenseDto> getAllExpenses(Pageable pageable);
