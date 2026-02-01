@@ -1,5 +1,6 @@
 package com.financetracker.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financetracker.dto.ApiResponse;
 import com.financetracker.dto.ExpenseDto;
 import com.financetracker.dto.MonthlyExpenseStatsDto;
@@ -26,6 +27,7 @@ import java.util.List;
 public class ExpenseController {
 
     private final ExpenseService expenseService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ExpenseDto>>> getAllExpenses(
@@ -45,13 +47,21 @@ public class ExpenseController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<ApiResponse<ExpenseDto>> createExpenseWithFile(
-            @RequestPart("expense") @Valid ExpenseDto expenseDto,
+            @RequestPart("expense") String expenseJson,
             @RequestPart(value = "billPhoto", required = false) org.springframework.web.multipart.MultipartFile billPhoto) {
         log.info("Creating new expense with file upload");
-        ExpenseDto createdExpense = expenseService.createExpenseWithFile(expenseDto, billPhoto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Expense created successfully", createdExpense));
+        try {
+            ExpenseDto expenseDto = objectMapper.readValue(expenseJson, ExpenseDto.class);
+            ExpenseDto createdExpense = expenseService.createExpenseWithFile(expenseDto, billPhoto);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.success("Expense created successfully", createdExpense));
+        } catch (Exception e) {
+            log.error("Error parsing expense JSON: {}", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Invalid expense data: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")

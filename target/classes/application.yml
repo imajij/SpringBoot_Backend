@@ -11,12 +11,12 @@ spring:
     serialization:
       write-dates-as-timestamps: false
     default-property-inclusion: non_null
-
+# vqye pwxb xmyp oxii 
   mail:
-    host: smtp.example.com
+    host: smtp.gmail.com
     port: 587
-    username: tharkimon23@gmail.com
-    password: Th@050106
+    username: Tharkimon23@gmail.com
+    password: vqye pwxb xmyp oxii 
     properties:
       mail:
         smtp:

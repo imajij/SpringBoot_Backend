@@ -58,7 +58,7 @@
 {
   "month": 1,
   "year": 2026,
-  "amount": 5000.00
+  "monthlyLimit": 5000.00
 }
 ```
 
@@ -85,7 +85,7 @@
 
 ```json
 {
-  "title": "Trip to Goa",
+  "name": "Trip to Goa",
   "totalAmount": 12000,
   "participants": [
     { "name": "Ajay", "email": "ajay@example.com" },
